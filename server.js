@@ -1,24 +1,19 @@
 import express from "express";
 import cors from "cors";
-import fs from "fs";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const app = express();
-
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
-// load JSON (works reliably in ESM)
-const jsonData = JSON.parse(
-  fs.readFileSync(new URL('./model.json', import.meta.url), 'utf8')
-);
+// serve ./public at /api
+app.use('/api', express.static(path.join(__dirname, 'public')));
 
-app.get("/", (req, res) => {
-  res.send("Hello, World!");
-});
-
-app.get('/api/model', (req, res) => {
-  res.json(jsonData);
-});
+app.get('/', (req, res) => res.send('Server OK'));
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {
